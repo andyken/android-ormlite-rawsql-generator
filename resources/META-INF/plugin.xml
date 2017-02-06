@@ -1,0 +1,34 @@
+<idea-plugin version="2">
+  <id>com.andyken.ormlite.rawsqlgenerator</id>
+  <name>OrmliteRawSqlGenerator</name>
+  <version>1.0</version>
+  <vendor email="njufyx@163.com" url="https://github.com/andyken">njufyx@163.com</vendor>
+
+  <description><![CDATA[
+      Plugin which generate the raw sql of ormlite class for you
+    ]]></description>
+
+  <change-notes><![CDATA[
+    ]]>
+  </change-notes>
+
+  <!-- please see http://www.jetbrains.org/intellij/sdk/docs/basics/getting_started/build_number_ranges.html for description -->
+  <idea-version since-build="141.0"/>
+
+  <!-- please see http://www.jetbrains.org/intellij/sdk/docs/basics/getting_started/plugin_compatibility.html
+       on how to target different products -->
+  <depends>com.intellij.modules.lang</depends>
+
+  <extensions defaultExtensionNs="com.intellij">
+    <!-- Add your extensions here -->
+  </extensions>
+
+  <actions>
+
+    <action id="GenerateRawSqlId" class="GenerateRawSqlAction" text="Generate Raw Sql of ormlite class"
+            description="generate raw sql of ormlite class">
+      <add-to-group group-id="GenerateGroup" anchor="last"/>
+    </action>
+  </actions>
+
+</idea-plugin>
