@@ -24,7 +24,6 @@ import java.util.List;
 public class GenerateDialog extends DialogWrapper {
 
     private CollectionListModel<PsiField> fieldsCollection;
-    private Class entityClass;
     private LabeledComponent<JPanel> fieldsComponent;
     private JBCheckBox includeSubclasses;
     private boolean showCheckbox;
@@ -67,7 +66,6 @@ public class GenerateDialog extends DialogWrapper {
      */
     private void updateFieldsDisplay(PsiClass psiClass) {
         final List<PsiField> fields;
-//        entityClass = psiClass.getSuperClass();
         if (includeSubclasses.isSelected()) {
             fields = getClassFields(psiClass.getAllFields());
         } else {
@@ -83,7 +81,8 @@ public class GenerateDialog extends DialogWrapper {
     private List<PsiField> getClassFields(PsiField[] allFields) {
         final List<PsiField> fields = new ArrayList<PsiField>();
         for (PsiField field : allFields) {
-            if (!field.hasModifierProperty(PsiModifier.STATIC) && !field.hasModifierProperty(PsiModifier.TRANSIENT)) {
+            if (!field.hasModifierProperty(PsiModifier.STATIC) && !field.hasModifierProperty(PsiModifier.TRANSIENT)
+                    && field.getText().indexOf("DatabaseField") > 0) {
                 fields.add(field);
             }
         }

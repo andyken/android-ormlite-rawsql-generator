@@ -1,2 +1,8 @@
 # android-ormlite-rawsql-generator
-Generate raw sql of ormlite class
+
+This plugin generates raw insert and update sql of ormlite class for you.
+
+## Installation
+
+
+## Usage

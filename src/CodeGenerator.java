@@ -14,26 +14,25 @@ public class CodeGenerator {
 
     private PsiClass psiClass;
     private List<PsiField> fields;
-//    private Class entityClass;
     private TypeFactory typeFactory;
     private static final int FIELD_RETURN_NUM = 5;
 
     public CodeGenerator(PsiClass psiClass, List<PsiField> fields) {
         this.psiClass = psiClass;
         this.fields = fields;
-//        this.entityClass = entityClass;
         this.typeFactory = new PrimitiveTypeFactory();
     }
 
     public void generate(){
         PsiElementFactory elementFactory = JavaPsiFacade.getElementFactory(psiClass.getProject());
         PsiMethod rawInsertMethod = elementFactory.createMethodFromText(generateRawInsert(fields, psiClass), psiClass);
-//        JavaCodeStyleManager styleManager = JavaCodeStyleManager.getInstance(psiClass.getProject());
-        psiClass.addBefore(rawInsertMethod, psiClass.getLastChild());
+        PsiMethod rawUpdateMethod = elementFactory.createMethodFromText(generateRawUpdate(fields, psiClass), psiClass);
+        JavaCodeStyleManager styleManager = JavaCodeStyleManager.getInstance(psiClass.getProject());
+        styleManager.shortenClassReferences(psiClass.addBefore(rawInsertMethod, psiClass.getLastChild()));
+        styleManager.shortenClassReferences(psiClass.addBefore(rawUpdateMethod, psiClass.getLastChild()));
     }
 
     private String generateRawInsert(List<PsiField> fields, PsiClass psiClass) {
-        Class entityClass = psiClass.getClass();
         String entityClassName = psiClass.getQualifiedName();
         String tableName = "tableName";
         PsiField tableNameField = null;
@@ -50,10 +49,10 @@ public class CodeGenerator {
         }
         String entityObjectName = getEntityObjectName(entityClassName);
         StringBuilder sb = new StringBuilder("public long rawInsertWithRawSql(" + entityClassName + " " +
-                entityObjectName + ", SQLiteDatabase db) {");
-        sb.append("SQLiteStatement statement = null;")
-                .append("long rowId = 0;")
-                .append("try {")
+                entityObjectName + ", SQLiteDatabase db) {\n");
+        sb.append("SQLiteStatement statement = null;\n")
+                .append("long rowId = 0;\n")
+                .append("try {\n")
                 .append("statement = db.compileStatement(\"insert into ")
                 .append(tableName)
                 .append(" (");
@@ -70,28 +69,103 @@ public class CodeGenerator {
         for (int i = 1; i < fieldLength; i++) {
             sb.append(", ?");
         }
-        sb.append(")\");");
+        sb.append(")\");\n");
 
-        sb.append("statement.clearBindings();");
+        sb.append("statement.clearBindings();\n");
 
         for (int i = 0; i < fieldLength; i++) {
             TypeGenerator typeGenerator = typeFactory.getGenerator(fields.get(i).getType());
             //bind index start from one
             sb.append("statement.").append(typeGenerator.bindValue()).append("(")
                     .append(i + 1).append(", ").append(typeGenerator.getValue(entityObjectName, fields.get(i).getName()))
-                    .append("());");
+                    .append("());\n");
         }
 
-        sb.append("rowId = statement.executeInsert();");
-        sb.append("} catch (Exception e) {")
-                .append("e.printStackTrace();")
-                .append("} finally {")
-                .append("if (statement != null) {")
-                .append("statement.close();")
-                .append("}")
-                .append("}")
-                .append("return rowId;");
+        sb.append("rowId = statement.executeInsert();\n");
+        sb.append("} catch (Exception e) {\n")
+                .append("e.printStackTrace();\n")
+                .append("} finally {\n")
+                .append("if (statement != null) {\n")
+                .append("statement.close();\n")
+                .append("}\n")
+                .append("}\n")
+                .append("return rowId;\n");
         sb.append("}");
+        return sb.toString();
+    }
+
+    private String generateRawUpdate(List<PsiField> fields, PsiClass psiClass) {
+        String entityClassName = psiClass.getQualifiedName();
+        String tableName = "tableName";
+        PsiField tableNameField = null;
+        try {
+            tableNameField = psiClass.findFieldByName("TABLE_NAME", false);
+        } catch (Exception e) {
+            e.printStackTrace();
+        }
+        if (tableNameField != null) {
+            String tableNameVar = tableNameField.getText();
+            int startIndex = tableNameVar.indexOf("\"");
+            int endIndex = tableNameVar.lastIndexOf("\"");
+            tableName = tableNameVar.substring(startIndex + 1, endIndex);
+        }
+        String entityObjectName = getEntityObjectName(entityClassName);
+        StringBuilder sb = new StringBuilder("public long rawUpdateWithRawSql(" + entityClassName + " " +
+                entityObjectName + ", SQLiteDatabase db) {\n");
+        sb.append("SQLiteStatement statement = null;")
+                .append("long rowId = 0;")
+                .append("try {")
+                .append("statement = db.compileStatement(\"update ")
+                .append(tableName)
+                .append(" set\"+\n");
+
+        int fieldLength = fields.size();
+        PsiField indexField = null;
+        for (int i = 0; i < fieldLength; i++) {
+            PsiField field = fields.get(i);
+            if (field.getText().indexOf("generatedId") > 0) {
+                indexField = field;
+                continue;
+            }
+            sb.append("\" ").append(field.getName()).append(" = ?,\" + \n");
+        }
+        sb.append("\" where ");
+        if (indexField != null) {
+            sb.append(indexField.getName()).append(" = ?\");");
+        } else {
+            sb.append("id = ?\");\n");
+        }
+        sb.append("statement.clearBindings();\n");
+
+        TypeGenerator typeGenerator = null;
+        for (int i = 0; i < fieldLength; i++) {
+            PsiField field = fields.get(i);
+            if (field == indexField) {
+                continue;
+            }
+            typeGenerator = typeFactory.getGenerator(field.getType());
+            //bind index start from one
+            sb.append("statement.").append(typeGenerator.bindValue()).append("(")
+                    .append(i + 1).append(", ").append(typeGenerator.getValue(entityObjectName, field.getName()))
+                    .append("());\n");
+        }
+        if (indexField != null) {
+            typeGenerator = typeFactory.getGenerator(indexField.getType());
+            sb.append("statement.").append(typeGenerator.bindValue()).append("(")
+                    .append(fieldLength).append(", ").append(typeGenerator.getValue(entityObjectName, indexField.getName()))
+                            .append("());\n");
+        }
+        sb.append("rowId = statement.executeInsert();\n");
+        sb.append("} catch (Exception e) {\n")
+                .append("e.printStackTrace();\n")
+                .append("} finally {\n")
+                .append("if (statement != null) {\n")
+                .append("statement.close();\n")
+                .append("}\n")
+                .append("}\n")
+                .append("return rowId;\n");
+        sb.append("}");
+
         return sb.toString();
     }
 
