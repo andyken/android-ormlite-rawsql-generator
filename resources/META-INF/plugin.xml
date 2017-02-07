@@ -1,14 +1,27 @@
 <idea-plugin version="2">
   <id>com.andyken.ormlite.rawsqlgenerator</id>
   <name>OrmliteRawSqlGenerator</name>
-  <version>1.0</version>
+  <version>1.1</version>
   <vendor email="njufyx@163.com" url="https://github.com/andyken">njufyx@163.com</vendor>
 
   <description><![CDATA[
-      Plugin which generate the raw sql of ormlite class for you
+      <html>
+        Plugin which generate the raw sql of ormlite class for you<br>
+        <a href="https://github.com/andyken/android-ormlite-rawsql-generator"> openSource</a>
+      </html>
     ]]></description>
 
   <change-notes><![CDATA[
+  <b>1.1</b> (7/2/2017)
+  <ul>
+  <li>Add support for raw update sql</li>
+  <li>Parse field using ormlite annotation</li>
+  </ul>
+
+  <b>1.0</b> (6/2/2017)
+  <ul>
+  <li>Add support for raw insert sql</li>
+  </ul>
     ]]>
   </change-notes>
 
