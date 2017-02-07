@@ -36,6 +36,7 @@ public class CodeGenerator {
         String entityClassName = psiClass.getQualifiedName();
         String tableName = "tableName";
         PsiField tableNameField = null;
+        String entityObjectName = "entity";
         try {
             tableNameField = psiClass.findFieldByName("TABLE_NAME", false);
         } catch (Exception e) {
@@ -47,7 +48,7 @@ public class CodeGenerator {
             int endIndex = tableNameVar.lastIndexOf("\"");
             tableName = tableNameVar.substring(startIndex + 1, endIndex);
         }
-        String entityObjectName = getEntityObjectName(entityClassName);
+
         StringBuilder sb = new StringBuilder("public long rawInsertWithRawSql(" + entityClassName + " " +
                 entityObjectName + ", SQLiteDatabase db) {\n");
         sb.append("SQLiteStatement statement = null;\n")
@@ -98,6 +99,7 @@ public class CodeGenerator {
         String entityClassName = psiClass.getQualifiedName();
         String tableName = "tableName";
         PsiField tableNameField = null;
+        String entityObjectName = "entity";
         try {
             tableNameField = psiClass.findFieldByName("TABLE_NAME", false);
         } catch (Exception e) {
@@ -109,7 +111,6 @@ public class CodeGenerator {
             int endIndex = tableNameVar.lastIndexOf("\"");
             tableName = tableNameVar.substring(startIndex + 1, endIndex);
         }
-        String entityObjectName = getEntityObjectName(entityClassName);
         StringBuilder sb = new StringBuilder("public long rawUpdateWithRawSql(" + entityClassName + " " +
                 entityObjectName + ", SQLiteDatabase db) {\n");
         sb.append("SQLiteStatement statement = null;")
