@@ -8,8 +8,8 @@ This plugin generates raw insert and update sql of ormlite class for you.
 
 ## Usage
 
-    ![](img/android-ormlite-rawsql-generator.gif)
+![](img/android-ormlite-rawsql-generator.gif)
 
-    1.Right click on the ormlite class, then `Generate` and `Generate Raw Sql of ormlite class`
-    2.Pick fields you want, you also have an option to include fields from the super class.
-    3.Click `Confirm`.
+1.Right click on the ormlite class, then `Generate` and `Generate Raw Sql of ormlite class`
+2.Pick fields you want, you also have an option to include fields from the super class.
+3.Click `Confirm`.
