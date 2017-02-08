@@ -4,7 +4,11 @@ This plugin generates raw insert and update sql of ormlite class for you.
 
 ## Installation
 
-- [download it](https://github.com/andyken/android-ormlite-rawsql-generator/blob/master/RawSqlGenerator.jar) and install via `Preferences → Plugins → Install plugin from disk`
+- in Android Studio: go to `Preferences → Plugins → Browse repositories` and search for `OrmliteRawSqlGenerator`
+
+_or_
+
+- [download it](https://plugins.jetbrains.com/androidstudio/plugin/9454-ormliterawsqlgenerator) and install via `Preferences → Plugins → Install plugin from disk`
 
 ## Usage
 
