@@ -14,6 +14,7 @@ _or_
 
 ![](img/android-ormlite-rawsql-generator.gif)
 
-1. Right click on the ormlite class, then `Generate` and `Generate Raw Sql of ormlite class`
-2. Pick fields you want, you also have an option to include fields from the super class.
-3. Click `Confirm`.
+1. Please ensure using the ormlite annoation @DatabaseTable(tableName=you_table_name) and @DatabaseField on your database field.
+2. Right click on the ormlite class, then `Generate` and `Generate Raw Sql of ormlite class`
+3. Pick fields you want, you also have an option to include fields from the super class.
+4. Click `Confirm`.
