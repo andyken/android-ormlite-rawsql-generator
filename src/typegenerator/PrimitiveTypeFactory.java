@@ -1,4 +1,4 @@
-package typegenerater;
+package typegenerator;
 
 import com.intellij.psi.PsiType;
 

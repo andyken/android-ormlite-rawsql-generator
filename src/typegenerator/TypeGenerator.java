@@ -1,4 +1,4 @@
-package typegenerater;
+package typegenerator;
 
 /**
  * Created by fengyuexin on 17/2/6.

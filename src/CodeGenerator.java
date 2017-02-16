@@ -1,10 +1,9 @@
 import com.intellij.psi.*;
 import com.intellij.psi.codeStyle.JavaCodeStyleManager;
-import typegenerater.PrimitiveTypeFactory;
-import typegenerater.TypeFactory;
-import typegenerater.TypeGenerator;
+import typegenerator.PrimitiveTypeFactory;
+import typegenerator.TypeFactory;
+import typegenerator.TypeGenerator;
 
-import java.lang.reflect.Field;
 import java.util.List;
 
 /**
@@ -50,8 +49,8 @@ public class CodeGenerator {
         }
 
         StringBuilder sb = new StringBuilder("public long rawInsertWithRawSql(" + entityClassName + " " +
-                entityObjectName + ", SQLiteDatabase db) {\n");
-        sb.append("SQLiteStatement statement = null;\n")
+                entityObjectName + ", android.database.sqlite.SQLiteDatabase db) {\n");
+        sb.append("android.database.sqlite.SQLiteStatement statement = null;\n")
                 .append("long rowId = 0;\n")
                 .append("try {\n")
                 .append("statement = db.compileStatement(\"insert into ")
@@ -76,10 +75,12 @@ public class CodeGenerator {
 
         for (int i = 0; i < fieldLength; i++) {
             TypeGenerator typeGenerator = typeFactory.getGenerator(fields.get(i).getType());
-            //bind index start from one
-            sb.append("statement.").append(typeGenerator.bindValue()).append("(")
-                    .append(i + 1).append(", ").append(typeGenerator.getValue(entityObjectName, fields.get(i).getName()))
-                    .append("());\n");
+            if (typeGenerator != null) {
+                //bind index start from one
+                sb.append("statement.").append(typeGenerator.bindValue()).append("(")
+                        .append(i + 1).append(", ").append(typeGenerator.getValue(entityObjectName, fields.get(i).getName()))
+                        .append("());\n");
+            }
         }
 
         sb.append("rowId = statement.executeInsert();\n");
@@ -112,8 +113,8 @@ public class CodeGenerator {
             tableName = tableNameVar.substring(startIndex + 1, endIndex);
         }
         StringBuilder sb = new StringBuilder("public long rawUpdateWithRawSql(" + entityClassName + " " +
-                entityObjectName + ", SQLiteDatabase db) {\n");
-        sb.append("SQLiteStatement statement = null;")
+                entityObjectName + ", android.database.sqlite.SQLiteDatabase db) {\n");
+        sb.append("android.database.sqlite.SQLiteStatement statement = null;")
                 .append("long rowId = 0;")
                 .append("try {")
                 .append("statement = db.compileStatement(\"update ")
@@ -145,16 +146,20 @@ public class CodeGenerator {
                 continue;
             }
             typeGenerator = typeFactory.getGenerator(field.getType());
-            //bind index start from one
-            sb.append("statement.").append(typeGenerator.bindValue()).append("(")
-                    .append(i + 1).append(", ").append(typeGenerator.getValue(entityObjectName, field.getName()))
-                    .append("());\n");
+            if (typeGenerator != null) {
+                //bind index start from one
+                sb.append("statement.").append(typeGenerator.bindValue()).append("(")
+                        .append(i + 1).append(", ").append(typeGenerator.getValue(entityObjectName, field.getName()))
+                        .append("());\n");
+            }
         }
         if (indexField != null) {
             typeGenerator = typeFactory.getGenerator(indexField.getType());
-            sb.append("statement.").append(typeGenerator.bindValue()).append("(")
-                    .append(fieldLength).append(", ").append(typeGenerator.getValue(entityObjectName, indexField.getName()))
-                            .append("());\n");
+            if (typeGenerator != null) {
+                sb.append("statement.").append(typeGenerator.bindValue()).append("(")
+                        .append(fieldLength).append(", ").append(typeGenerator.getValue(entityObjectName, indexField.getName()))
+                        .append("());\n");
+            }
         }
         sb.append("rowId = statement.executeInsert();\n");
         sb.append("} catch (Exception e) {\n")
